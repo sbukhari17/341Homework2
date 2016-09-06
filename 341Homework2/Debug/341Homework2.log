@@ -1,0 +1,5 @@
+﻿  MovieReview.cpp
+  Movie.cpp
+  Executor.cpp
+c:\users\syed\documents\visual studio 2015\projects\341homework2\341homework2\executor.cpp(12): error C3861: 'parseMovies': identifier not found
+  Generating Code...
