@@ -20,7 +20,7 @@ int main() {
 	vector<Movie> movies = parseMovies("movies.csv");
 	cout << movies.size() << endl;
 	cout << ">> Reading reviews... ";
-	vector<MovieReview>moviereviews = parseReviews("reviews-2.csv", movies);
+	vector<MovieReview>moviereviews = parseReviews("reviews.csv", movies);
 	cout << moviereviews.size() << endl;
 	cout << endl;
 	calculateAverages(movies);
@@ -42,7 +42,7 @@ int main() {
 			<< '\t' << movies.at(i).avgReview
 			<< '\t' << '\'' << movies.at(i).movieName << '\'' << endl;
 	}
-	
+	cout << endl;
 	cout << ">> Top-10 Users <<" << endl;
 	cout << endl;
 	vector<User> users = createUserInfo(moviereviews);
@@ -60,6 +60,7 @@ int main() {
 			<< '\t' << users.at(i).id
 			<< '\t' << users.at(i).numReviews << endl;
 	}
+	cout << endl;
 	runInteractiveLoop(movies);
 
 
@@ -136,11 +137,13 @@ vector<User> createUserInfo(vector <MovieReview> & movieReviews) {
 }
 void runInteractiveLoop(vector<Movie> & movies) {
 	string input;
+	cout << ">> Movie Information <<" << endl;
+	cout << endl;
 	string prompt = "Pleae enter a movie ID [1.." + to_string(movies.size()) + "], 0 to stop: ";
-	do {
-		cout << endl;
-		cout << prompt;
-		cin >> input;
+	
+	cout << prompt;
+	cin >> input;
+	while (stoi(input) != 0){
 		int entry = stoi(input);
 		if (entry<0 || entry > movies.size()) {
 			cout << "** Invalid movie id, please try again..." << endl;
@@ -153,6 +156,7 @@ void runInteractiveLoop(vector<Movie> & movies) {
 			});
 			if (iterator != movies.end()) {
 				auto index = distance(movies.begin(), iterator);
+				cout << endl;
 				cout << "Movie:\t" << '\'' << movies.at(index).movieName << '\'' << endl;
 				cout << "Year:\t" << movies.at(index).pubYear << endl;
 				cout << "Avg rating:\t" << movies.at(index).avgReview << endl;
@@ -162,9 +166,12 @@ void runInteractiveLoop(vector<Movie> & movies) {
 				cout << "Num 3's:\t" << movies.at(index).ratingCount[2] << endl;
 				cout << "Num 4's:\t" << movies.at(index).ratingCount[3] << endl;
 				cout << "Num 5's:\t" << movies.at(index).ratingCount[4] << endl;
+				cout << endl;
 			}
+			cout << prompt;
+			cin >> input;
 		}
-	} while (stoi(input) != 0);
+	} 
 	cout << endl;
 	cout << endl;
 	cout << "** DONE! **" << endl;
