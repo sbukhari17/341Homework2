@@ -109,7 +109,7 @@ vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies) {
 		movieReviews.push_back(mr);
 	}
 	sort(movieReviews.begin(), movieReviews.end(), [](const MovieReview & mov1, const MovieReview & mov2) {
-		return mov1.movieID < mov2.movieID;
+		return mov1.userID < mov2.userID;
 	});
 	return movieReviews;
 }
@@ -123,16 +123,16 @@ void calculateAverages(vector<Movie>& movies) {
 vector<User> createUserInfo(vector <MovieReview> & movieReviews) { //not being used
 	vector<User> users;
 	int currIndex = 0;
-	int currID = movieReviews.at(0).movieID;
-	users.push_back(User(currID));
+	int currID = -1;
 	for (MovieReview & movReview : movieReviews) {
-		if (movReview.movieID == currID) {
+		if (movReview.userID == currID) {
 			users.at(currIndex).numReviews++;
 		}
 		else {
-			currID = movReview.movieID;
+			currID = movReview.userID;
 			users.push_back(User(currID));
-			currIndex++;
+			if (users.size() - currIndex >= 2)
+				currIndex++;
 		}
 	}
 	return users;
