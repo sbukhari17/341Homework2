@@ -20,7 +20,8 @@ int main() {
 	vector<Movie> movies = parseMovies("movies.csv");
 	cout << movies.size() << endl;
 	cout << ">> Reading reviews... ";
-	vector<MovieReview>moviereviews = parseReviews("reviews.csv", movies);
+	vector<User> users;
+	vector<MovieReview>moviereviews = parseReviews("reviews.csv", movies, users);
 	cout << moviereviews.size() << endl;
 	cout << endl;
 	calculateAverages(movies);
@@ -45,7 +46,7 @@ int main() {
 	cout << endl;
 	cout << ">> Top-10 Users <<" << endl;
 	cout << endl;
-	vector<User> users = createUserInfo(moviereviews);
+	
 	sort(users.begin(), users.end(), [](User & user1, User & user2) {
 		if (user1.numReviews > user2.numReviews)
 			return true;
@@ -84,7 +85,7 @@ vector<Movie> parseMovies(string movieFile) { //parses movie file and returns ve
 	}
 	return movies;
 }
-vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies ) {
+vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies, vector<User> & users ) {
 	vector<MovieReview> movieReviews;
 	ifstream reviewStream(reviewFile);
 	string input;
@@ -107,6 +108,18 @@ vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies ) {
 			movies[index].reviewSum += mr.rating;
 			movies[index].numReviews++;
 		}
+		auto iterator = find_if(users.begin(), users.end(), [&mr](User const & user) {
+			return mr.userID == user.id;
+		});
+		if (iterator == users.end()) {
+			User u(mr.userID);
+			users.push_back(u);
+		}
+		else {
+			auto index = distance(users.begin(), iterator);
+			users.at(index).numReviews++;
+		}
+	
 		movieReviews.push_back(mr);
 	}
 	return movieReviews;
@@ -118,7 +131,7 @@ void calculateAverages(vector<Movie>& movies) {
 	}
 }
 
-vector<User> createUserInfo(vector <MovieReview> & movieReviews) {
+vector<User> createUserInfo(vector <MovieReview> & movieReviews) { //not being used
 	vector<User> users;
 	for (MovieReview & movReview : movieReviews) {
 		auto iterator = find_if(users.begin(), users.end(), [&movReview](User const & user) {
