@@ -20,8 +20,10 @@ int main() {
 	vector<Movie> movies = parseMovies("movies.csv");
 	cout << movies.size() << endl;
 	cout << ">> Reading reviews... ";
-	vector<User> users;
-	vector<MovieReview>moviereviews = parseReviews("reviews.csv", movies, users);
+	sort(movies.begin(), movies.end(), [](Movie & mov1, Movie & mov2) {
+		return mov1.movieID < mov2.movieID;
+	});
+	vector<MovieReview>moviereviews = parseReviews("reviews-2.csv", movies);
 	cout << moviereviews.size() << endl;
 	cout << endl;
 	calculateAverages(movies);
@@ -46,7 +48,7 @@ int main() {
 	cout << endl;
 	cout << ">> Top-10 Users <<" << endl;
 	cout << endl;
-	
+	vector <User> users = createUserInfo(moviereviews);
 	sort(users.begin(), users.end(), [](User & user1, User & user2) {
 		if (user1.numReviews > user2.numReviews)
 			return true;
@@ -85,7 +87,7 @@ vector<Movie> parseMovies(string movieFile) { //parses movie file and returns ve
 	}
 	return movies;
 }
-vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies, vector<User> & users ) {
+vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies) {
 	vector<MovieReview> movieReviews;
 	ifstream reviewStream(reviewFile);
 	string input;
@@ -99,29 +101,16 @@ vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies, vec
 		getline(ss, rating, ',');
 		getline(ss, reviewdate, ',');
 		MovieReview mr(stoi(movieid), stoi(userid), stoi(rating), reviewdate);
-		auto it= find_if(movies.begin(), movies.end(), [&mr](Movie const & m){
-			return mr.movieID == m.movieID;
-		});	
-		if (it != movies.end()) {
-			auto index = distance(movies.begin(), it);
-			movies[index].ratingCount[mr.rating - 1]++;
-			movies[index].reviewSum += mr.rating;
-			movies[index].numReviews++;
-		}
-		auto iterator = find_if(users.begin(), users.end(), [&mr](User const & user) {
-			return mr.userID == user.id;
-		});
-		if (iterator == users.end()) {
-			User u(mr.userID);
-			users.push_back(u);
-		}
-		else {
-			auto index = distance(users.begin(), iterator);
-			users.at(index).numReviews++;
-		}
+
+		movies[mr.movieID-1].ratingCount[mr.rating - 1]++;
+		movies[mr.movieID-1].reviewSum += mr.rating;
+		movies[mr.movieID-1].numReviews++;
 	
 		movieReviews.push_back(mr);
 	}
+	sort(movieReviews.begin(), movieReviews.end(), [](const MovieReview & mov1, const MovieReview & mov2) {
+		return mov1.movieID < mov2.movieID;
+	});
 	return movieReviews;
 }
 
@@ -133,17 +122,17 @@ void calculateAverages(vector<Movie>& movies) {
 
 vector<User> createUserInfo(vector <MovieReview> & movieReviews) { //not being used
 	vector<User> users;
+	int currIndex = 0;
+	int currID = movieReviews.at(0).movieID;
+	users.push_back(User(currID));
 	for (MovieReview & movReview : movieReviews) {
-		auto iterator = find_if(users.begin(), users.end(), [&movReview](User const & user) {
-			return movReview.userID == user.id;
-		});
-		if(iterator == users.end()){
-			User u(movReview.userID);
-			users.push_back(u);
-		} 
+		if (movReview.movieID == currID) {
+			users.at(currIndex).numReviews++;
+		}
 		else {
-			auto index = distance(users.begin(), iterator);
-			users.at(index).numReviews++;
+			currID = movReview.movieID;
+			users.push_back(User(currID));
+			currIndex++;
 		}
 	}
 	return users;
