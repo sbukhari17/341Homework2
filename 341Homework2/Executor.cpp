@@ -23,7 +23,7 @@ int main() {
 	sort(movies.begin(), movies.end(), [](Movie & mov1, Movie & mov2) {
 		return mov1.movieID < mov2.movieID;
 	});
-	vector<MovieReview>moviereviews = parseReviews("reviews-2.csv", movies);
+	vector<MovieReview>moviereviews = parseReviews("reviews.csv", movies);
 	cout << moviereviews.size() << endl;
 	cout << endl;
 	calculateAverages(movies);
@@ -70,6 +70,12 @@ int main() {
 
 	return 0;
 }
+
+/**
+*
+* Parses movies file, created movie vector
+*
+**/
 vector<Movie> parseMovies(string movieFile) { //parses movie file and returns vector of movies
 	vector<Movie> movies;
 	ifstream movieStream(movieFile);
@@ -87,6 +93,12 @@ vector<Movie> parseMovies(string movieFile) { //parses movie file and returns ve
 	}
 	return movies;
 }
+
+/**
+*
+* Parses the review file, adds rating info to corresponding movies
+*
+**/
 vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies) {
 	vector<MovieReview> movieReviews;
 	ifstream reviewStream(reviewFile);
@@ -114,13 +126,24 @@ vector <MovieReview> parseReviews(string reviewFile, vector<Movie> & movies) {
 	return movieReviews;
 }
 
+/**
+*
+* Calculates average movie review for every movie
+*
+**/
 void calculateAverages(vector<Movie>& movies) {
 	for (Movie & movie : movies) {
 		movie.avgReview = (double)movie.reviewSum / (double)movie.numReviews;
 	}
 }
 
-vector<User> createUserInfo(vector <MovieReview> & movieReviews) { //not being used
+/**
+*
+* Creates userInfo using a sorted MovieReview vector
+* Counts occurences of userIDs in said sorted vector and increments their count
+*
+**/
+vector<User> createUserInfo(vector <MovieReview> & movieReviews) { 
 	vector<User> users;
 	int currIndex = 0;
 	int currID = -1;
@@ -137,7 +160,13 @@ vector<User> createUserInfo(vector <MovieReview> & movieReviews) { //not being u
 	}
 	return users;
 }
-void runInteractiveLoop(vector<Movie> & movies) {
+
+/**
+*
+* Runs the interactive loop that finds the movie corresponding to a movie ID and outputs its info
+*
+**/
+void runInteractiveLoop(vector<Movie> & movies) { 
 	string input;
 	cout << ">> Movie Information <<" << endl;
 	cout << endl;
